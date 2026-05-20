@@ -235,6 +235,7 @@ export default function MultiplayerGamePage({
           legalMoves={legalMoves}
           lastMove={lastMove}
           onSquareClick={handleSquareClick}
+          flipped={role === 'black'}
         />
 
         {/* ── Role + connection indicator ─────────────────────────────── */}

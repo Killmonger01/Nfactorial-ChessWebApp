@@ -7,6 +7,7 @@ interface BoardProps {
   legalMoves: Square[]
   lastMove: Move | null
   onSquareClick: (sq: Square) => void
+  flipped?: boolean
 }
 
 export default function BoardComponent({
@@ -15,6 +16,7 @@ export default function BoardComponent({
   legalMoves,
   lastMove,
   onSquareClick,
+  flipped = false,
 }: BoardProps) {
   const legalSet = new Set(legalMoves.map(m => `${m.row},${m.col}`))
 
@@ -55,7 +57,9 @@ export default function BoardComponent({
         >
       {board.map((rowArr, row) =>
         rowArr.map((piece, col) => {
-          const isLight = (row + col) % 2 === 0
+          const displayRow = flipped ? 7 - row : row
+          const displayCol = flipped ? 7 - col : col
+          const isLight = (displayRow + displayCol) % 2 === 0
           const isSelected = !!selectedSquare && selectedSquare.row === row && selectedSquare.col === col
           const isLegal = legalSet.has(`${row},${col}`)
           const isLastFrom = !!lastMove && lastMove.from.row === row && lastMove.from.col === col
@@ -64,15 +68,15 @@ export default function BoardComponent({
           return (
             <SquareComponent
               key={`${row}-${col}`}
-              row={row}
-              col={col}
+              row={displayRow}
+              col={displayCol}
               piece={piece}
               isLight={isLight}
               isSelected={isSelected}
               isLegalMove={isLegal}
               isLastMoveFrom={isLastFrom}
               isLastMoveTo={isLastTo}
-              onClick={onSquareClick}
+              onClick={() => onSquareClick({ row, col })}
             />
           )
         })
