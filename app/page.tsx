@@ -34,6 +34,7 @@ export default function Home() {
     lastMove,
     mode,
     skillLevel,
+    playerColor,
     movesCount,
     aiThinking,
     engineReady,
@@ -96,9 +97,9 @@ export default function Home() {
     if (movesCount === 0) gameSavedRef.current = false
   }, [movesCount])
 
-  function handleStart(m: GameMode, skill: number) {
+  function handleStart(m: GameMode, skill: number, color: 'white' | 'black' = 'white') {
     setSetupOpen(false)
-    newGame(m, skill)
+    newGame(m, skill, color)
   }
 
   async function handleStartMultiplayer() {
@@ -241,6 +242,7 @@ export default function Home() {
                 legalMoves={legalMoves}
                 lastMove={lastMove}
                 onSquareClick={handleSquareClick}
+                flipped={mode === 'ai' && playerColor === 'black'}
               />
             </div>
             {/* AI thinking overlay */}

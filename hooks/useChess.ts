@@ -22,16 +22,17 @@ interface ChessUIState {
   lastMove: Move | null
   mode: GameMode
   skillLevel: number
+  playerColor: 'white' | 'black'
 }
 
 type Action =
   | { type: 'SELECT'; square: Square }
   | { type: 'MOVE'; from: Square; to: Square; promotionPiece?: PieceType }
   | { type: 'UNDO' }
-  | { type: 'NEW_GAME'; mode: GameMode; skillLevel: number }
+  | { type: 'NEW_GAME'; mode: GameMode; skillLevel: number; playerColor: 'white' | 'black' }
   | { type: 'RESTORE'; state: ChessUIState }
 
-function makeInitialState(mode: GameMode = 'pvp', skillLevel = 10): ChessUIState {
+function makeInitialState(mode: GameMode = 'pvp', skillLevel = 10, playerColor: 'white' | 'black' = 'white'): ChessUIState {
   return {
     gameState: createInitialGameState(),
     history: [],
@@ -40,6 +41,7 @@ function makeInitialState(mode: GameMode = 'pvp', skillLevel = 10): ChessUIState
     lastMove: null,
     mode,
     skillLevel,
+    playerColor,
   }
 }
 
@@ -49,14 +51,14 @@ function reducer(state: ChessUIState, action: Action): ChessUIState {
       return action.state
 
     case 'NEW_GAME':
-      return makeInitialState(action.mode, action.skillLevel)
+      return makeInitialState(action.mode, action.skillLevel, action.playerColor)
 
     case 'SELECT': {
       const { square } = action
-      const { gameState, selectedSquare, mode } = state
+      const { gameState, selectedSquare, mode, playerColor } = state
 
       // Block clicks when it's the AI's turn
-      if (mode === 'ai' && gameState.currentTurn === 'black') return state
+      if (mode === 'ai' && gameState.currentTurn !== playerColor) return state
 
       // Deselect if same square clicked again
       if (selectedSquare &&
@@ -202,7 +204,7 @@ export function useChess() {
 
     if (!engineReady || !engineRef.current) return
     if (mode !== 'ai') return
-    if (gameState.currentTurn !== 'black') return
+    if (gameState.currentTurn === state.playerColor) return  // human's turn
     if (gameState.isCheckmate || gameState.isStalemate) return
     if (aiThinking) return
 
@@ -243,10 +245,10 @@ export function useChess() {
     dispatch({ type: 'UNDO' })
   }, [])
 
-  const newGame = useCallback((mode: GameMode = 'pvp', skillLevel = 10) => {
+  const newGame = useCallback((mode: GameMode = 'pvp', skillLevel = 10, playerColor: 'white' | 'black' = 'white') => {
     aiRequestRef.current++
     setAiThinking(false)
-    dispatch({ type: 'NEW_GAME', mode, skillLevel })
+    dispatch({ type: 'NEW_GAME', mode, skillLevel, playerColor })
   }, [])
 
   return {
@@ -257,6 +259,7 @@ export function useChess() {
     lastMove:       state.lastMove,
     mode:           state.mode,
     skillLevel:     state.skillLevel,
+    playerColor:    state.playerColor,
     movesCount:     state.history.length,
     aiThinking,
     engineReady,
