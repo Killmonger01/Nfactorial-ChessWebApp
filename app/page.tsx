@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import BoardComponent from '@/components/Board'
 import GameStatus from '@/components/GameStatus'
 import MoveHistory from '@/components/MoveHistory'
@@ -10,6 +11,7 @@ import AuthModal from '@/components/AuthModal'
 import UserMenu from '@/components/UserMenu'
 import { useChess, type GameMode } from '@/hooks/useChess'
 import { useAuth } from '@/hooks/useAuth'
+import { useIsPro } from '@/hooks/useIsPro'
 import { saveGame } from '@/lib/db'
 import { toAlgebraicNotation, createInitialGameState } from '@/lib/chess'
 import { supabase } from '@/lib/supabase'
@@ -41,6 +43,7 @@ export default function Home() {
   } = useChess()
 
   const { user, loading: authLoading, signOut } = useAuth()
+  const { isPro } = useIsPro()
 
   const [setupOpen, setSetupOpen]         = useState(false)
   const [authOpen, setAuthOpen]           = useState(false)
@@ -141,36 +144,123 @@ export default function Home() {
 
       {/* ── Top header ───────────────────────────────────────────────────── */}
       <header
-        className="w-full px-4 py-3 flex items-center justify-between"
-        style={{ background: '#0f3460' }}
+        className="w-full px-6 py-3.5 flex items-center justify-between flex-shrink-0"
+        style={{
+          background: 'rgba(7,11,15,0.9)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(16,185,129,0.1)',
+          boxShadow: '0 1px 0 rgba(16,185,129,0.05)',
+        }}
       >
-        <span className="text-white font-bold tracking-wide">♟ Chess</span>
-        <UserMenu
-          user={user}
-          loading={authLoading}
-          onSignOut={signOut}
-          onSignIn={() => setAuthOpen(true)}
-        />
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <div
+            className="flex items-center justify-center w-8 h-8 rounded-lg"
+            style={{
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              boxShadow: '0 0 16px rgba(16,185,129,0.4)',
+            }}
+          >
+            <span style={{ fontSize: '1rem', filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))' }}>♟</span>
+          </div>
+          <span style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 700, letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>
+            Chess
+          </span>
+        </div>
+
+        {/* Nav */}
+        <div className="flex items-center gap-4">
+          <Link
+            href="/profile"
+            className="text-sm font-medium transition-all duration-200"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-muted)' }}
+          >
+            Profile
+          </Link>
+
+          {isPro ? (
+            <span
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+              style={{
+                background: 'linear-gradient(135deg, #f0a500, #d97706)',
+                color: '#1a0a00',
+                boxShadow: '0 0 16px rgba(240,165,0,0.35)',
+                letterSpacing: '0.03em',
+              }}
+            >
+              ✨ Pro
+            </span>
+          ) : (
+            <Link
+              href="/pricing"
+              className="text-sm font-semibold px-3.5 py-1.5 rounded-lg transition-all duration-200"
+              style={{
+                background: 'rgba(16,185,129,0.1)',
+                border: '1px solid rgba(16,185,129,0.25)',
+                color: 'var(--accent)',
+              }}
+              onMouseEnter={e => {
+                const a = e.currentTarget as HTMLAnchorElement
+                a.style.background = 'rgba(16,185,129,0.18)'
+                a.style.boxShadow = '0 0 16px rgba(16,185,129,0.2)'
+              }}
+              onMouseLeave={e => {
+                const a = e.currentTarget as HTMLAnchorElement
+                a.style.background = 'rgba(16,185,129,0.1)'
+                a.style.boxShadow = 'none'
+              }}
+            >
+              Upgrade ✨
+            </Link>
+          )}
+
+          <UserMenu
+            user={user}
+            loading={authLoading}
+            onSignOut={signOut}
+            onSignIn={() => setAuthOpen(true)}
+          />
+        </div>
       </header>
 
-      <main className="min-h-[calc(100vh-52px)] flex flex-col items-center justify-center p-4 gap-6">
+      <main className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center p-6 gap-6">
         <div className="flex flex-col lg:flex-row items-start gap-6 w-full max-w-5xl">
-          {/* Board */}
+          {/* Board — chess table feel */}
           <div className="flex-1 flex justify-center relative">
-            <BoardComponent
-              board={gameState.board}
-              selectedSquare={selectedSquare}
-              legalMoves={legalMoves}
-              lastMove={lastMove}
-              onSquareClick={handleSquareClick}
-            />
+            {/* Outer table shadow */}
+            <div
+              style={{
+                filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.85)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
+              }}
+            >
+              <BoardComponent
+                board={gameState.board}
+                selectedSquare={selectedSquare}
+                legalMoves={legalMoves}
+                lastMove={lastMove}
+                onSquareClick={handleSquareClick}
+              />
+            </div>
             {/* AI thinking overlay */}
             {aiThinking && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
-                  className="rounded-xl px-4 py-2 text-white text-sm font-semibold shadow-lg"
-                  style={{ background: 'rgba(15,52,96,0.85)' }}
+                  className="flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold"
+                  style={{
+                    background: 'rgba(7,11,15,0.88)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(16,185,129,0.3)',
+                    borderRadius: '999px',
+                    color: 'var(--accent)',
+                    boxShadow: '0 0 20px rgba(16,185,129,0.15)',
+                  }}
                 >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ background: 'var(--accent)', animation: 'jade-pulse 1.4s ease-in-out infinite' }}
+                  />
                   AI is thinking…
                 </div>
               </div>
@@ -179,11 +269,32 @@ export default function Home() {
 
           {/* Sidebar */}
           <div
-            className="w-full lg:w-64 flex flex-col gap-4 rounded-xl p-4"
-            style={{ backgroundColor: '#16213e', minHeight: '280px' }}
+            className="w-full lg:w-72 flex flex-col gap-4 p-5"
+            style={{
+              background: 'rgba(9,14,22,0.75)',
+              border: '1px solid rgba(16,185,129,0.08)',
+              borderRadius: '20px',
+              backdropFilter: 'blur(24px)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
+              minHeight: '280px',
+            }}
           >
             {/* Mode indicator */}
-            <div className="text-xs text-center rounded-lg py-1 px-2" style={{ background: '#0f3460', color: '#a0aec0' }}>
+            <div
+              className="text-xs text-center py-1.5 px-3"
+              style={{
+                background: mode === 'ai'
+                  ? 'rgba(16,185,129,0.08)'
+                  : 'rgba(255,255,255,0.04)',
+                border: mode === 'ai'
+                  ? '1px solid rgba(16,185,129,0.2)'
+                  : '1px solid var(--border)',
+                borderRadius: '999px',
+                color: mode === 'ai' ? 'var(--accent)' : 'var(--text-muted)',
+                fontWeight: 500,
+                letterSpacing: '0.01em',
+              }}
+            >
               {mode === 'ai'
                 ? `🤖 vs AI — ${diffLabel}${!engineReady ? ' (loading…)' : ''}`
                 : '👥 Two Players'}
@@ -192,18 +303,42 @@ export default function Home() {
             {/* Status */}
             <GameStatus gameState={gameState} onNewGame={() => newGame(mode, skillLevel)} />
 
+            {/* Divider */}
+            <div style={{ height: '1px', background: 'rgba(16,185,129,0.06)' }} />
+
             {/* Controls */}
             <div className="flex gap-2">
               <button
                 onClick={() => setSetupOpen(true)}
-                className="flex-1 py-2 rounded-lg text-sm font-semibold bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors"
+                className="flex-1 py-2.5 text-sm font-bold text-white transition-all duration-200 hover:-translate-y-px active:translate-y-0"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  borderRadius: '10px',
+                  boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(16,185,129,0.5)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 12px rgba(16,185,129,0.3)' }}
               >
                 New Game
               </button>
               <button
                 onClick={undoMove}
                 disabled={history.length === 0 || aiThinking}
-                className="flex-1 py-2 rounded-lg text-sm font-semibold bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 py-2.5 text-sm font-semibold transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed hover:-translate-y-px active:translate-y-0"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-muted)',
+                  borderRadius: '10px',
+                }}
+                onMouseEnter={e => {
+                  const b = e.currentTarget as HTMLButtonElement
+                  if (!b.disabled) { b.style.borderColor = 'rgba(16,185,129,0.4)'; b.style.color = 'var(--text-primary)' }
+                }}
+                onMouseLeave={e => {
+                  const b = e.currentTarget as HTMLButtonElement
+                  b.style.borderColor = 'var(--border)'; b.style.color = 'var(--text-muted)'
+                }}
               >
                 Undo
               </button>

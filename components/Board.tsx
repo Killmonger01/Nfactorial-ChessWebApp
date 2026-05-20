@@ -21,16 +21,38 @@ export default function BoardComponent({
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(8, 1fr)',
-        gridTemplateRows: 'repeat(8, 1fr)',
-        width: 'min(90vw, 90vh, 560px)',
-        height: 'min(90vw, 90vh, 560px)',
-        borderRadius: '4px',
-        overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6)',
+        /* Rich walnut wood frame */
+        background: 'linear-gradient(160deg, #2a1400 0%, #3d1e08 30%, #261200 60%, #3d1e08 80%, #2a1400 100%)',
+        borderRadius: '14px',
+        padding: '12px',
+        boxShadow:
+          '0 0 0 1px rgba(255,200,100,0.06),' +
+          '0 4px 0 1px #1a0900,' +
+          '0 40px 80px rgba(0,0,0,0.9),' +
+          '0 16px 40px rgba(0,0,0,0.6),' +
+          'inset 0 1px 0 rgba(255,200,100,0.12),' +
+          'inset 0 -1px 0 rgba(0,0,0,0.5)',
       }}
     >
+      {/* Subtle wood grain ring */}
+      <div
+        style={{
+          borderRadius: '4px',
+          overflow: 'hidden',
+          boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.6)',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(8, 1fr)',
+            gridTemplateRows: 'repeat(8, 1fr)',
+            width: 'min(90vw, 90vh, 560px)',
+            height: 'min(90vw, 90vh, 560px)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}
+        >
       {board.map((rowArr, row) =>
         rowArr.map((piece, col) => {
           const isLight = (row + col) % 2 === 0
@@ -55,6 +77,8 @@ export default function BoardComponent({
           )
         })
       )}
+        </div>
+      </div>
     </div>
   )
 }

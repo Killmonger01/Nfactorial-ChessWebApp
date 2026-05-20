@@ -30,14 +30,17 @@ export default function PieceComponent({ piece }: PieceProps) {
     <span
       className="select-none leading-none"
       style={{
-        fontSize: '2.4rem',
+        display: 'block',
+        fontSize: '2.6rem',
         lineHeight: 1,
         color:
           piece.color === 'white' ? '#ffffff' : '#1a1a1a',
         textShadow:
           piece.color === 'white'
-            ? '0 1px 3px #000, 0 0 1px #000'
-            : 'none',
+            ? '0 2px 4px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.8)'
+            : '0 1px 3px rgba(0,0,0,0.6)',
+        filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.4))',
+        transition: 'transform 0.15s ease',
         userSelect: 'none',
       }}
       aria-label={`${piece.color} ${piece.type}`}

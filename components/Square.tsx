@@ -24,13 +24,13 @@ export default function SquareComponent({
   isLastMoveTo,
   onClick,
 }: SquareProps) {
-  const baseColor = isLight ? '#f0d9b5' : '#b58863'
+  const baseColor = isLight ? '#f0d9b5' : '#b07040'
 
   let bg = baseColor
   if (isSelected) {
-    bg = isLight ? '#f6f668' : '#baca2b'
+    bg = isLight ? '#a8f0cf' : '#2ea875'
   } else if (isLastMoveFrom || isLastMoveTo) {
-    bg = isLight ? '#cdd16f' : '#aaa23a'
+    bg = isLight ? '#c8ecd8' : '#4a9e70'
   }
 
   return (
@@ -40,45 +40,46 @@ export default function SquareComponent({
       aria-label={`${String.fromCharCode(97 + col)}${8 - row}`}
       onClick={() => onClick({ row, col })}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onClick({ row, col }) }}
-      style={{ backgroundColor: bg }}
-      className="relative flex items-center justify-center w-full h-full cursor-pointer"
+      style={{ backgroundColor: bg, transition: 'filter 0.1s ease' }}
+      className="relative flex items-center justify-center w-full h-full cursor-pointer hover:brightness-110"
     >
-      {/* Legal move dot */}
+      {/* Legal move dot — jade */}
       {isLegalMove && !piece && (
         <div
           className="rounded-full pointer-events-none"
           style={{
             width: '30%',
             height: '30%',
-            backgroundColor: 'rgba(0,0,0,0.18)',
+            backgroundColor: 'rgba(16,185,129,0.45)',
+            boxShadow: '0 0 6px rgba(16,185,129,0.3)',
           }}
         />
       )}
-      {/* Legal move capture ring */}
+      {/* Legal move capture ring — jade */}
       {isLegalMove && piece && (
         <div
           className="absolute inset-0 rounded-none pointer-events-none"
           style={{
-            boxShadow: 'inset 0 0 0 4px rgba(0,0,0,0.22)',
+            boxShadow: 'inset 0 0 0 4px rgba(16,185,129,0.55)',
           }}
         />
       )}
       {piece && <PieceComponent piece={piece} />}
 
-      {/* Rank label (left side, col 0) */}
+      {/* Rank label */}
       {col === 0 && (
         <span
-          className="absolute top-0.5 left-0.5 text-xs font-semibold pointer-events-none"
-          style={{ color: isLight ? '#b58863' : '#f0d9b5', fontSize: '0.65rem' }}
+          className="absolute top-0.5 left-0.5 pointer-events-none"
+          style={{ color: isLight ? '#b07040' : '#f0d9b5', fontSize: '0.58rem', fontWeight: 700, fontFamily: "'JetBrains Mono', 'DM Mono', monospace", opacity: 0.8 }}
         >
           {8 - row}
         </span>
       )}
-      {/* File label (bottom, row 7) */}
+      {/* File label */}
       {row === 7 && (
         <span
-          className="absolute bottom-0.5 right-0.5 text-xs font-semibold pointer-events-none"
-          style={{ color: isLight ? '#b58863' : '#f0d9b5', fontSize: '0.65rem' }}
+          className="absolute bottom-0.5 right-0.5 pointer-events-none"
+          style={{ color: isLight ? '#b07040' : '#f0d9b5', fontSize: '0.58rem', fontWeight: 700, fontFamily: "'JetBrains Mono', 'DM Mono', monospace", opacity: 0.8 }}
         >
           {String.fromCharCode(97 + col)}
         </span>

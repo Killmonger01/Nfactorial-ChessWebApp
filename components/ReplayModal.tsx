@@ -9,6 +9,8 @@ import {
 } from '@/lib/chess'
 import type { Board, GameState } from '@/lib/types'
 import type { GameRow } from '@/lib/db'
+import { useIsPro } from '@/hooks/useIsPro'
+import Link from 'next/link'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -184,6 +186,7 @@ interface Props {
 }
 
 export default function ReplayModal({ game, onClose }: Props) {
+  const { isPro } = useIsPro()
   // Precompute all positions once
   const positions = useMemo(() => buildPositions(game.pgn ?? ''), [game.pgn])
   const tokens    = useMemo(() => (game.pgn ?? '').trim().split(/\s+/).filter(Boolean), [game.pgn])
@@ -508,7 +511,38 @@ export default function ReplayModal({ game, onClose }: Props) {
             >
               🤖 AI Coach
             </p>
-            {idx === 0 ? (
+
+            {!isPro ? (
+              /* ── Locked state ── */
+              <div
+                className="flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{
+                  background: 'rgba(118,150,86,0.07)',
+                  border: '1px solid rgba(118,150,86,0.2)',
+                }}
+              >
+                <span style={{ fontSize: '1.25rem' }}>🔒</span>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold" style={{ color: '#e8eaf0' }}>
+                    AI Coach is a Pro feature
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: '#718096' }}>
+                    Get move-by-move Gemini analysis with a Pro subscription.
+                  </p>
+                </div>
+                <Link
+                  href="/pricing"
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg flex-shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, #769656, #22c55e)',
+                    color: '#fff',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Upgrade ✨
+                </Link>
+              </div>
+            ) : idx === 0 ? (
               <p className="text-xs italic" style={{ color: '#4a5568' }}>
                 Navigate to any move to get AI coaching.
               </p>
