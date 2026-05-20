@@ -6,12 +6,12 @@ interface GameStatusProps {
 }
 
 export default function GameStatus({ gameState, onNewGame }: GameStatusProps) {
-  const { currentTurn, isCheck, isCheckmate, isStalemate, winner } = gameState
+  const { currentTurn, isCheck, isCheckmate, isStalemate, winner, isResigned, resignedBy } = gameState
 
   return (
     <div className="flex flex-col gap-3">
       {/* Turn indicator */}
-      {!isCheckmate && !isStalemate && (
+      {!isCheckmate && !isStalemate && !isResigned && (
         <div className="flex items-center gap-2">
           <div
             className="w-4 h-4 rounded-full"
@@ -44,14 +44,18 @@ export default function GameStatus({ gameState, onNewGame }: GameStatusProps) {
             className="shadow-2xl p-8 flex flex-col items-center gap-4 max-w-sm w-full mx-4"
             style={{ background: 'rgba(9,14,22,0.95)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '20px', backdropFilter: 'blur(24px)', boxShadow: '0 0 60px rgba(0,0,0,0.9), 0 0 30px rgba(16,185,129,0.08)' }}
           >
-            <div className="text-6xl">{isCheckmate ? '♛' : '🤝'}</div>
+            <div className="text-6xl">{isResigned ? '🏳️' : isCheckmate ? '♛' : '🤝'}</div>
             <h2 className="text-2xl font-bold text-white text-center">
-              {isCheckmate
+              {isResigned
+                ? `${resignedBy === 'white' ? 'White' : 'Black'} resigned — ${winner === 'white' ? 'White' : 'Black'} wins!`
+                : isCheckmate
                 ? `Checkmate — ${winner === 'white' ? 'White' : 'Black'} wins!`
                 : 'Stalemate — Draw!'}
             </h2>
             <p className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-              {isCheckmate
+              {isResigned
+                ? `${resignedBy === 'white' ? 'White' : 'Black'} chose to resign the game.`
+                : isCheckmate
                 ? `${winner === 'white' ? 'Black' : 'White'} has no legal moves and is in check.`
                 : 'No legal moves available. The game is a draw.'}
             </p>

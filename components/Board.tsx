@@ -55,11 +55,10 @@ export default function BoardComponent({
             overflow: 'hidden',
           }}
         >
-      {board.map((rowArr, row) =>
-        rowArr.map((piece, col) => {
-          const displayRow = flipped ? 7 - row : row
-          const displayCol = flipped ? 7 - col : col
-          const isLight = (displayRow + displayCol) % 2 === 0
+      {Array.from({ length: 8 }, (_, i) => flipped ? 7 - i : i).flatMap(row =>
+        Array.from({ length: 8 }, (_, j) => flipped ? 7 - j : j).map(col => {
+          const piece = board[row][col]
+          const isLight = (row + col) % 2 === 0
           const isSelected = !!selectedSquare && selectedSquare.row === row && selectedSquare.col === col
           const isLegal = legalSet.has(`${row},${col}`)
           const isLastFrom = !!lastMove && lastMove.from.row === row && lastMove.from.col === col
@@ -68,14 +67,15 @@ export default function BoardComponent({
           return (
             <SquareComponent
               key={`${row}-${col}`}
-              row={displayRow}
-              col={displayCol}
+              row={row}
+              col={col}
               piece={piece}
               isLight={isLight}
               isSelected={isSelected}
               isLegalMove={isLegal}
               isLastMoveFrom={isLastFrom}
               isLastMoveTo={isLastTo}
+              flipped={flipped}
               onClick={() => onSquareClick({ row, col })}
             />
           )

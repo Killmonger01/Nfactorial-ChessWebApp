@@ -25,6 +25,7 @@ export default function MultiplayerGamePage({
     status,
     error,
     applyMove,
+    resign,
   } = useMultiplayer(gameId)
 
   const { user } = useAuth()
@@ -32,6 +33,7 @@ export default function MultiplayerGamePage({
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null)
   const [legalMoves, setLegalMoves]         = useState<Square[]>([])
   const [copied, setCopied]                 = useState(false)
+  const [resignConfirm, setResignConfirm]   = useState(false)
 
   // Refs for game-save logic
   const gameSavedRef    = useRef(false)
@@ -153,7 +155,9 @@ export default function MultiplayerGamePage({
   let statusText = ''
   let statusColor = '#a0aec0'
   if (gameState.isCheckmate) {
-    statusText = `Checkmate — ${gameState.winner === 'white' ? 'White' : 'Black'} wins!`
+    statusText = gameState.isResigned
+      ? `${gameState.resignedBy === 'white' ? 'White' : 'Black'} resigned — ${gameState.winner === 'white' ? 'White' : 'Black'} wins!`
+      : `Checkmate — ${gameState.winner === 'white' ? 'White' : 'Black'} wins!`
     statusColor = '#e05252'
   } else if (gameState.isStalemate) {
     statusText = 'Stalemate — Draw!'
@@ -266,7 +270,37 @@ export default function MultiplayerGamePage({
             Back to Home
           </button>
         )}
-      </main>
+        {/* ── Resign ─────────────────────────────────────────────────────── */}
+        {!gameOver && status === 'active' && (
+          <div className="flex gap-2 w-full max-w-sm">
+            {resignConfirm ? (
+              <>
+                <button
+                  onClick={async () => { setResignConfirm(false); await resign() }}
+                  className="flex-1 py-2 rounded-lg text-sm font-bold text-white transition-opacity hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)', boxShadow: '0 2px 10px rgba(220,38,38,0.3)' }}
+                >
+                  Yes, resign
+                </button>
+                <button
+                  onClick={() => setResignConfirm(false)}
+                  className="flex-1 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  style={{ background: '#0f3460' }}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setResignConfirm(true)}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                style={{ background: 'transparent', border: '1px solid rgba(220,38,38,0.35)', color: '#f87171' }}
+              >
+                Resign
+              </button>
+            )}
+          </div>
+        )}      </main>
     </div>
   )
 }

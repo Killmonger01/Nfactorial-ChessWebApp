@@ -40,6 +40,8 @@ export interface GameState {
   isCheckmate: boolean
   isStalemate: boolean
   winner: Color | null
+  isResigned?: boolean
+  resignedBy?: Color
 }
 
 export interface HistoryEntry {

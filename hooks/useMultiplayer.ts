@@ -24,6 +24,7 @@ export interface UseMultiplayerReturn {
   status: MultiplayerStatus
   error: string | null
   applyMove: (newGameState: GameState, move: Move) => Promise<void>
+  resign: () => Promise<void>
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -100,5 +101,26 @@ export function useMultiplayer(gameId: string): UseMultiplayerReturn {
     [gameId],
   )
 
-  return { playerId, role, opponentConnected, gameState, lastMove, status, error, applyMove }
+  const resign = useCallback(async () => {
+    if (!role || !gameState) return
+    const opponent: 'white' | 'black' = role === 'white' ? 'black' : 'white'
+    const resignedState: GameState = {
+      ...gameState,
+      isCheckmate: true,
+      winner: opponent,
+      isResigned: true,
+      resignedBy: role,
+    }
+    setGameState(resignedState)
+    await supabase
+      .from('multiplayer_games')
+      .update({
+        fen: JSON.stringify(resignedState),
+        current_turn: resignedState.currentTurn,
+        status: 'finished',
+      })
+      .eq('id', gameId)
+  }, [role, gameState, gameId])
+
+  return { playerId, role, opponentConnected, gameState, lastMove, status, error, applyMove, resign }
 }

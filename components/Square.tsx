@@ -10,6 +10,7 @@ interface SquareProps {
   isLegalMove: boolean
   isLastMoveFrom: boolean
   isLastMoveTo: boolean
+  flipped?: boolean
   onClick: (sq: Square) => void
 }
 
@@ -22,6 +23,7 @@ export default function SquareComponent({
   isLegalMove,
   isLastMoveFrom,
   isLastMoveTo,
+  flipped = false,
   onClick,
 }: SquareProps) {
   const baseColor = isLight ? '#f0d9b5' : '#b07040'
@@ -67,7 +69,7 @@ export default function SquareComponent({
       {piece && <PieceComponent piece={piece} />}
 
       {/* Rank label */}
-      {col === 0 && (
+      {((!flipped && col === 0) || (flipped && col === 7)) && (
         <span
           className="absolute top-0.5 left-0.5 pointer-events-none"
           style={{ color: isLight ? '#b07040' : '#f0d9b5', fontSize: '0.58rem', fontWeight: 700, fontFamily: "'JetBrains Mono', 'DM Mono', monospace", opacity: 0.8 }}
@@ -76,7 +78,7 @@ export default function SquareComponent({
         </span>
       )}
       {/* File label */}
-      {row === 7 && (
+      {((!flipped && row === 7) || (flipped && row === 0)) && (
         <span
           className="absolute bottom-0.5 right-0.5 pointer-events-none"
           style={{ color: isLight ? '#b07040' : '#f0d9b5', fontSize: '0.58rem', fontWeight: 700, fontFamily: "'JetBrains Mono', 'DM Mono', monospace", opacity: 0.8 }}

@@ -8,7 +8,7 @@ import {
   movePiece,
 } from '@/lib/chess'
 import { StockfishEngine, uciMoveToSquares } from '@/lib/stockfish'
-import type { GameState, HistoryEntry, Move, PieceType, Square } from '@/lib/types'
+import type { Color, GameState, HistoryEntry, Move, PieceType, Square } from '@/lib/types'
 
 const STORAGE_KEY = 'chess_game_state_v2'
 
@@ -31,6 +31,7 @@ type Action =
   | { type: 'UNDO' }
   | { type: 'NEW_GAME'; mode: GameMode; skillLevel: number; playerColor: 'white' | 'black' }
   | { type: 'RESTORE'; state: ChessUIState }
+  | { type: 'RESIGN'; resigningColor: Color }
 
 function makeInitialState(mode: GameMode = 'pvp', skillLevel = 10, playerColor: 'white' | 'black' = 'white'): ChessUIState {
   return {
@@ -130,6 +131,22 @@ function reducer(state: ChessUIState, action: Action): ChessUIState {
         selectedSquare: null,
         legalMoves: [],
         lastMove: targetIdx >= 1 ? history[targetIdx - 1].move : null,
+      }
+    }
+
+    case 'RESIGN': {
+      const opponent: Color = action.resigningColor === 'white' ? 'black' : 'white'
+      return {
+        ...state,
+        gameState: {
+          ...state.gameState,
+          isCheckmate: true,
+          winner: opponent,
+          isResigned: true,
+          resignedBy: action.resigningColor,
+        },
+        selectedSquare: null,
+        legalMoves: [],
       }
     }
 
@@ -251,6 +268,15 @@ export function useChess() {
     dispatch({ type: 'NEW_GAME', mode, skillLevel, playerColor })
   }, [])
 
+  const resign = useCallback(() => {
+    const resigningColor: Color = state.mode === 'ai'
+      ? state.playerColor
+      : state.gameState.currentTurn
+    aiRequestRef.current++
+    setAiThinking(false)
+    dispatch({ type: 'RESIGN', resigningColor })
+  }, [state.mode, state.playerColor, state.gameState.currentTurn])
+
   return {
     gameState:      state.gameState,
     history:        state.history,
@@ -266,5 +292,6 @@ export function useChess() {
     handleSquareClick,
     undoMove,
     newGame,
+    resign,
   }
 }

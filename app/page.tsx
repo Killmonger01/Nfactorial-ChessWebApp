@@ -41,6 +41,7 @@ export default function Home() {
     handleSquareClick,
     undoMove,
     newGame,
+    resign,
   } = useChess()
 
   const { user, loading: authLoading, signOut } = useAuth()
@@ -48,6 +49,7 @@ export default function Home() {
 
   const [setupOpen, setSetupOpen]         = useState(false)
   const [authOpen, setAuthOpen]           = useState(false)
+  const [resignConfirm, setResignConfirm] = useState(false)
   const [mpLoading, setMpLoading]         = useState(false)
   // Prevents saving the same completed game more than once
   const gameSavedRef = useRef<boolean>(false)
@@ -345,6 +347,40 @@ export default function Home() {
                 Undo
               </button>
             </div>
+
+            {/* Resign */}
+            {!gameState.isCheckmate && !gameState.isStalemate && !gameState.isResigned && (
+              <div className="flex gap-2">
+                {resignConfirm ? (
+                  <>
+                    <button
+                      onClick={() => { setResignConfirm(false); resign() }}
+                      className="flex-1 py-2 text-sm font-bold text-white transition-all duration-200 hover:-translate-y-px"
+                      style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)', borderRadius: '10px', boxShadow: '0 2px 12px rgba(220,38,38,0.3)' }}
+                    >
+                      Yes, resign
+                    </button>
+                    <button
+                      onClick={() => setResignConfirm(false)}
+                      className="flex-1 py-2 text-sm font-semibold transition-all duration-200"
+                      style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', borderRadius: '10px' }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setResignConfirm(true)}
+                    className="w-full py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-px"
+                    style={{ background: 'transparent', border: '1px solid rgba(220,38,38,0.3)', color: '#f87171', borderRadius: '10px' }}
+                    onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = 'rgba(220,38,38,0.6)'; b.style.color = '#ef4444' }}
+                    onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.borderColor = 'rgba(220,38,38,0.3)'; b.style.color = '#f87171' }}
+                  >
+                    Resign
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Move history */}
             <div className="flex-1 overflow-hidden" style={{ maxHeight: '360px' }}>
