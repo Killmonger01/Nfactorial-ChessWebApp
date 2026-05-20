@@ -5,12 +5,12 @@ import type { Piece } from '@/lib/types'
 // White pieces use the outline/hollow glyphs; black use the filled glyphs.
 const UNICODE: Record<string, Record<string, string>> = {
   white: {
-    king:   '\u2654\uFE0E',  // ♔ white king
-    queen:  '\u2655\uFE0E',  // ♕ white queen
-    rook:   '\u2656\uFE0E',  // ♖ white rook
-    bishop: '\u2657\uFE0E',  // ♗ white bishop
-    knight: '\u2658\uFE0E',  // ♘ white knight
-    pawn:   '\u2659\uFE0E',  // ♙ white pawn
+    king:   '\u265A\uFE0E',  // ♚ filled — colored white via CSS
+    queen:  '\u265B\uFE0E',  // ♛
+    rook:   '\u265C\uFE0E',  // ♜
+    bishop: '\u265D\uFE0E',  // ♝
+    knight: '\u265E\uFE0E',  // ♞
+    pawn:   '\u265F\uFE0E',  // ♟
   },
   black: {
     king:   '\u265A\uFE0E',  // ♚ black king
