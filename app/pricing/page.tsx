@@ -134,7 +134,6 @@ export default function PricingPage() {
               background: 'rgba(13,21,32,0.9)',
               border: '2px solid rgba(16,185,129,0.5)',
               boxShadow: '0 0 0 1px rgba(16,185,129,0.08), 0 0 60px rgba(16,185,129,0.15), 0 20px 40px rgba(0,0,0,0.6)',
-              animation: 'border-glow-spin 4s linear infinite',
             }}
           >
             {/* Popular badge */}
